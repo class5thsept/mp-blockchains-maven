@@ -1,4 +1,5 @@
 package edu.grinnell.csc207.blockchains;
+import java.util.Arrays;
 
 /**
  * Encapsulated hashes.
@@ -11,6 +12,7 @@ public class Hash {
   // | Fields |
   // +--------+
 
+  byte[] data;
   // +--------------+------------------------------------------------
   // | Constructors |
   // +--------------+
@@ -22,7 +24,7 @@ public class Hash {
    *   The data to copy into the hash.
    */
   public Hash(byte[] data) {
-    // STUB
+    this.data = Arrays.copyOf(data, data.length);
   } // Hash(byte[])
 
   // +---------+-----------------------------------------------------
@@ -35,7 +37,7 @@ public class Hash {
    * @return the number of bytes in the hash.
    */
   public int length() {
-    return 0;   // STUB
+    return data.length;
   } // length()
 
   /**
@@ -48,7 +50,7 @@ public class Hash {
    * @return the ith byte
    */
   public byte get(int i) {
-    return 0;   // STUB
+    return data[i];
   } // get()
 
   /**
@@ -58,7 +60,7 @@ public class Hash {
    * @return a copy of the bytes in the hash.
    */
   public byte[] getBytes() {
-    return new byte[] {1, 2, 3, 4, 5};      // STUB
+    return Arrays.copyOf(data, data.length);
   } // getBytes()
 
   /**
@@ -67,7 +69,13 @@ public class Hash {
    * @return the hash as a hex string.
    */
   public String toString() {
-    return "";          // STUB
+    StringBuilder str = new StringBuilder();
+    for (int i = 0; i < data.length; i++) {
+      int temp = Byte.toUnsignedInt(data[i]);
+      String tempstr = String.format("%02X", temp);
+      str.append(tempstr);
+    }
+    return str.toString();
   } // toString()
 
   /**
@@ -80,7 +88,11 @@ public class Hash {
    *   otherwise.
    */
   public boolean equals(Object other) {
-    return false;       // STUB
+    if (other instanceof Hash) {
+      Hash o = (Hash) other;
+      return Arrays.equals(o.getBytes(), this.data);
+    }
+    return false;
   } // equals(Object)
 
   /**
