@@ -12,6 +12,9 @@ public class Hash {
   // | Fields |
   // +--------+
 
+  /**
+   * The data stored in the hash.
+   */
   byte[] data;
   // +--------------+------------------------------------------------
   // | Constructors |
@@ -74,7 +77,7 @@ public class Hash {
       int temp = Byte.toUnsignedInt(data[i]);
       String tempstr = String.format("%02X", temp);
       str.append(tempstr);
-    }
+    } // for
     return str.toString();
   } // toString()
 
@@ -91,7 +94,7 @@ public class Hash {
     if (other instanceof Hash) {
       Hash o = (Hash) other;
       return Arrays.equals(o.getBytes(), this.data);
-    }
+    } // if
     return false;
   } // equals(Object)
 

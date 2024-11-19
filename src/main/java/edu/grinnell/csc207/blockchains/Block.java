@@ -11,6 +11,31 @@ public class Block {
   // | Fields |
   // +--------+
 
+  /**
+   * The number of the block in the blockchain.
+   */
+  int num;
+
+  /**
+   * The transaction stored in the block.
+   */
+  Transaction transaction;
+
+  /**
+   * The hash of the previous block in the chain.
+   */
+  Hash prevHash;
+
+  /**
+   * The nonce of this block.
+   */
+  long nonce;
+
+  /**
+   * The hash of this block.
+   */
+  Hash hash;
+
   // +--------------+------------------------------------------------
   // | Constructors |
   // +--------------+
@@ -31,7 +56,9 @@ public class Block {
    */
   public Block(int num, Transaction transaction, Hash prevHash,
       HashValidator check) {
-    // STUB
+    long newnonce = 0; // STUB
+    // finds nonce
+    new Block(num, transaction, prevHash, newnonce);
   } // Block(int, Transaction, Hash, HashValidator)
 
   /**
@@ -47,7 +74,11 @@ public class Block {
    *   The nonce of the block.
    */
   public Block(int num, Transaction transaction, Hash prevHash, long nonce) {
-    // STUB
+    this.num = num;
+    this.transaction = transaction;
+    this.prevHash = prevHash;
+    this.nonce = nonce;
+    // finds hash
   } // Block(int, Transaction, Hash, long)
 
   // +---------+-----------------------------------------------------
@@ -72,7 +103,7 @@ public class Block {
    * @return the number of the block.
    */
   public int getNum() {
-    return 0;   // STUB
+    return num;
   } // getNum()
 
   /**
@@ -81,7 +112,7 @@ public class Block {
    * @return the transaction.
    */
   public Transaction getTransaction() {
-    return new Transaction("Here", "There", 0); // STUB
+    return transaction;
   } // getTransaction()
 
   /**
@@ -90,7 +121,7 @@ public class Block {
    * @return the nonce.
    */
   public long getNonce() {
-    return 0;   // STUB
+    return nonce;
   } // getNonce()
 
   /**
@@ -99,7 +130,7 @@ public class Block {
    * @return the hash of the previous block.
    */
   Hash getPrevHash() {
-    return new Hash(new byte[] {0});  // STUB
+    return prevHash;
   } // getPrevHash
 
   /**
@@ -108,7 +139,7 @@ public class Block {
    * @return the hash of the current block.
    */
   Hash getHash() {
-    return new Hash(new byte[] {0});  // STUB
+    return hash;
   } // getHash
 
   /**
