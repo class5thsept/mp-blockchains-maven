@@ -14,7 +14,8 @@ import java.io.InputStreamReader;
 /**
  * A simple UI for our BlockChain class.
  *
- * @author Your Name Here
+ * @author Leonardo Alves Nunes
+ * @author Natalie Nardone
  * @author Samuel A. Rebelsky
  */
 public class BlockChainUI {

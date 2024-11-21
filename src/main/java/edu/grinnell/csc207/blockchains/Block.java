@@ -1,9 +1,14 @@
 package edu.grinnell.csc207.blockchains;
+import java.nio.ByteBuffer;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
 
 /**
  * Blocks to be stored in blockchains.
  *
- * @author Your Name Here
+ * @author Leonardo Alves Nunes
+ * @author Natalie Nardone
  * @author Samuel A. Rebelsky
  */
 public class Block {
@@ -56,9 +61,19 @@ public class Block {
    */
   public Block(int num, Transaction transaction, Hash prevHash,
       HashValidator check) {
-    long newnonce = 0; // STUB
-    // finds nonce
-    new Block(num, transaction, prevHash, newnonce);
+    this.num = num;
+    this.transaction = transaction;
+    this.prevHash = prevHash;
+    long count = 0;
+    do {
+      this.nonce = count;
+      try {
+        this.computeHash();
+      } catch (NoSuchAlgorithmException e) {
+        System.err.println("Invalid algorithm");
+      } // try/catch
+      count++;
+    } while (!check.isValid(hash));
   } // Block(int, Transaction, Hash, HashValidator)
 
   /**
@@ -78,7 +93,11 @@ public class Block {
     this.transaction = transaction;
     this.prevHash = prevHash;
     this.nonce = nonce;
-    // finds hash
+    try {
+      this.computeHash();
+    } catch (NoSuchAlgorithmException e) {
+      System.err.println("Invalid algorithm");
+    } // try/catch
   } // Block(int, Transaction, Hash, long)
 
   // +---------+-----------------------------------------------------
@@ -89,8 +108,22 @@ public class Block {
    * Compute the hash of the block given all the other info already
    * stored in the block.
    */
-  static void computeHash() {
-    // STUB
+  private void computeHash() throws NoSuchAlgorithmException {
+    MessageDigest md = MessageDigest.getInstance("sha-256");
+    byte[] numbytes = ByteBuffer.allocate(Integer.BYTES).putInt(num).array();
+    byte[] sourcebytes = transaction.getSource().getBytes();
+    byte[] targetbytes = transaction.getTarget().getBytes();
+    byte[] amountbytes = ByteBuffer.allocate(Integer.BYTES).putInt(transaction.getAmount()).array();
+    byte[] prevbytes = prevHash.getBytes();
+    byte[] noncebytes = ByteBuffer.allocate(Long.BYTES).putLong(nonce).array();
+    md.update(numbytes);
+    md.update(sourcebytes);
+    md.update(targetbytes);
+    md.update(amountbytes);
+    md.update(prevbytes);
+    md.update(noncebytes);
+    byte[] hash = md.digest();
+    this.hash = new Hash(hash);
   } // computeHash()
 
   // +---------+-----------------------------------------------------
@@ -148,6 +181,11 @@ public class Block {
    * @return a string representation of the block.
    */
   public String toString() {
-    return "";  // STUB
+    return 
+    "Block " + this.num + " (Transaction: " +
+     transaction.toString() + " , Nonce: " +
+      this.nonce + " , prevHash: " +
+       this.prevHash + " , hash: " +
+        this.hash + " )";
   } // toString()
 } // class Block

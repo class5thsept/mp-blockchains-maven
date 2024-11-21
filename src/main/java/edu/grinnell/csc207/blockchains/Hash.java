@@ -4,7 +4,8 @@ import java.util.Arrays;
 /**
  * Encapsulated hashes.
  *
- * @author Your Name Here
+ * @author Leonardo Alves Nunes
+ * @author Natalie Nardone
  * @author Samuel A. Rebelsky
  */
 public class Hash {
