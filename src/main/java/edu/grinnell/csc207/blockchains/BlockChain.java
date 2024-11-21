@@ -1,5 +1,6 @@
 package edu.grinnell.csc207.blockchains;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -13,6 +14,10 @@ public class BlockChain implements Iterable<Transaction> {
   // +--------+------------------------------------------------------
   // | Fields |
   // +--------+
+  int size;
+  Node first;
+  Node last;
+  HashValidator validator;
 
   // +--------------+------------------------------------------------
   // | Constructors |
@@ -25,7 +30,12 @@ public class BlockChain implements Iterable<Transaction> {
    *   The validator used to check elements.
    */
   public BlockChain(HashValidator check) {
-    // STUB
+    Block newBlock = new Block(0, new Transaction("", "", 0), new Hash(new byte[] {}), check);
+    Node newNode = new Node(null, newBlock, null);
+    this.size = 1;
+    this.first = newNode;
+    this.last = newNode;
+    this.validator = check;
   } // BlockChain(HashValidator)
 
   // +---------+-----------------------------------------------------
@@ -46,7 +56,11 @@ public class BlockChain implements Iterable<Transaction> {
    * @return a new block with correct number, hashes, and such.
    */
   public Block mine(Transaction t) {
-    return new Block(10, t, new Hash(new byte[] {7}), 11);       // STUB
+    if (this.balance(t.getSource()) >= t.getAmount()) {
+      return new Block(this.size + 1, t, this.getHash(), validator);
+    } else {
+      return new Block(-1, t, this.getHash(), 0);
+    }
   } // mine(Transaction)
 
   /**
@@ -55,7 +69,7 @@ public class BlockChain implements Iterable<Transaction> {
    * @return the number of blocks in the chain, including the initial block.
    */
   public int getSize() {
-    return 2;   // STUB
+    return this.size;
   } // getSize()
 
   /**
@@ -69,7 +83,21 @@ public class BlockChain implements Iterable<Transaction> {
    *   hash is incorrect.
    */
   public void append(Block blk) {
-    // STUB
+    Hash testHash;
+    try {
+      testHash = blk.computeHash();
+      if (validator.isValid(blk.getHash()) && (blk.getHash().equals(testHash)) && (blk.getPrevHash().equals(this.getHash()))) {
+        Node newNode = new Node(this.last, blk, null);
+        this.last.next = newNode;
+        this.last = newNode;
+        size++;
+        // update users and balances
+      } else {
+        throw new IllegalArgumentException();
+      }
+    } catch (NoSuchAlgorithmException e) {
+      System.err.println("Invalid algorithm");
+    }
   } // append()
 
   /**
@@ -89,7 +117,7 @@ public class BlockChain implements Iterable<Transaction> {
    * @return the hash of the last sblock in the chain.
    */
   public Hash getHash() {
-    return new Hash(new byte[] {2, 0, 7});   // STUB
+    return this.last.getBlock().getHash();
   } // getHash()
 
   /**

@@ -68,7 +68,7 @@ public class Block {
     do {
       this.nonce = count;
       try {
-        this.computeHash();
+        this.hash = this.computeHash();
       } catch (NoSuchAlgorithmException e) {
         System.err.println("Invalid algorithm");
       } // try/catch
@@ -94,7 +94,7 @@ public class Block {
     this.prevHash = prevHash;
     this.nonce = nonce;
     try {
-      this.computeHash();
+      this.hash = this.computeHash();
     } catch (NoSuchAlgorithmException e) {
       System.err.println("Invalid algorithm");
     } // try/catch
@@ -108,7 +108,7 @@ public class Block {
    * Compute the hash of the block given all the other info already
    * stored in the block.
    */
-  private void computeHash() throws NoSuchAlgorithmException {
+  public Hash computeHash() throws NoSuchAlgorithmException {
     MessageDigest md = MessageDigest.getInstance("sha-256");
     byte[] numbytes = ByteBuffer.allocate(Integer.BYTES).putInt(num).array();
     byte[] sourcebytes = transaction.getSource().getBytes();
@@ -123,7 +123,7 @@ public class Block {
     md.update(prevbytes);
     md.update(noncebytes);
     byte[] hash = md.digest();
-    this.hash = new Hash(hash);
+    return new Hash(hash);
   } // computeHash()
 
   // +---------+-----------------------------------------------------
