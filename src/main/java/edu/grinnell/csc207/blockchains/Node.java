@@ -25,6 +25,14 @@ public class Node {
     return this.block;
   }
 
+  public Node getNext() {
+    return this.next;
+  }
+
+  public Node getPrev() {
+    return this.prev;
+  }
+
   
 
 

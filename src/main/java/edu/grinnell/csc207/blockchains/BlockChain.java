@@ -3,6 +3,8 @@ package edu.grinnell.csc207.blockchains;
 import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import edu.grinnell.csc207.util.AssociativeArray;
+import java.util.ArrayList;
 
 /**
  * A full blockchain.
@@ -18,6 +20,8 @@ public class BlockChain implements Iterable<Transaction> {
   Node first;
   Node last;
   HashValidator validator;
+  AssociativeArray<String, Integer> balances;
+  ArrayList<String> userList;
 
   // +--------------+------------------------------------------------
   // | Constructors |
@@ -36,6 +40,8 @@ public class BlockChain implements Iterable<Transaction> {
     this.first = newNode;
     this.last = newNode;
     this.validator = check;
+    this.balances = new AssociativeArray<String, Integer>();
+    this.userList = new ArrayList<String>();
   } // BlockChain(HashValidator)
 
   // +---------+-----------------------------------------------------
@@ -56,11 +62,7 @@ public class BlockChain implements Iterable<Transaction> {
    * @return a new block with correct number, hashes, and such.
    */
   public Block mine(Transaction t) {
-    if (this.balance(t.getSource()) >= t.getAmount()) {
-      return new Block(this.size + 1, t, this.getHash(), validator);
-    } else {
-      return new Block(-1, t, this.getHash(), 0);
-    }
+    return new Block(this.size + 1, t, this.getHash(), validator);
   } // mine(Transaction)
 
   /**
@@ -91,6 +93,40 @@ public class BlockChain implements Iterable<Transaction> {
         this.last.next = newNode;
         this.last = newNode;
         size++;
+        String source = blk.getTransaction().getSource();
+        String target = blk.getTransaction().getTarget();
+        int amount = blk.getTransaction().getAmount();
+        if (!source.equals("")) {
+          if (balances.hasKey(source)) {
+            try {
+              balances.set(source, balances.get(source) - amount);
+            } catch (Exception e) {
+              System.err.println("Key exception");
+            }
+          } else {
+            // not valid
+            this.userList.add(source);
+            try {
+              balances.set(source, 0 - amount);
+            } catch (Exception e) {
+              System.err.println("Key exception");
+            }
+          }
+        }
+        if (balances.hasKey(target)) {
+          try {
+            balances.set(target, balances.get(target) + amount);
+          } catch (Exception e) {
+            System.err.println("Key exception");
+          }
+        } else {
+          this.userList.add(target);
+          try {
+            balances.set(target, amount);
+          } catch (Exception e) {
+            System.err.println("Key exception");
+          }
+        }
         // update users and balances
       } else {
         throw new IllegalArgumentException();
@@ -108,7 +144,31 @@ public class BlockChain implements Iterable<Transaction> {
    *   is removed).
    */
   public boolean removeLast() {
-    return true;        // STUB
+    if (this.size == 1) {
+      return false;
+    } else {
+      Node removed = this.last;
+      this.last = this.last.prev;
+      this.last.next = null;
+      this.size--;
+      
+      String source = removed.getBlock().getTransaction().getSource();
+      String target = removed.getBlock().getTransaction().getTarget();
+      int amount = removed.getBlock().getTransaction().getAmount();
+      
+      try {
+        if (!source.equals("")) {
+          balances.set(source, balances.get(source) + amount);
+          balances.set(target, balances.get(target) - amount);
+        } else {
+          balances.set(target, balances.get(target) - amount);
+        }
+      } catch (Exception e) {
+        System.err.println("Key exception");
+      }
+
+      return true;
+    }
   } // removeLast()
 
   /**
@@ -129,7 +189,19 @@ public class BlockChain implements Iterable<Transaction> {
    * @return true if the blockchain is correct and false otherwise.
    */
   public boolean isCorrect() {
-    return true;        // STUB
+    // source is in balances and has >= money than the amount
+    // compare current prevHash to prev hash
+    // compare computeHash to hash
+    // check hash with validator
+    Block current;
+    if (!blocks().hasNext()) {
+      return true;
+    }
+    blocks().next();
+    while (blocks().hasNext()) {
+      current = blocks().next();
+      // transaction
+    }
   } // isCorrect()
 
   /**
@@ -153,12 +225,22 @@ public class BlockChain implements Iterable<Transaction> {
    */
   public Iterator<String> users() {
     return new Iterator<String>() {
+
+      int cur = 0;
+      String update = "";
+
       public boolean hasNext() {
-        return false;   // STUB
+        return (this.cur < BlockChain.this.userList.size());
       } // hasNext()
 
       public String next() {
-        throw new NoSuchElementException();     // STUB
+        if (!this.hasNext()) {
+          throw new NoSuchElementException();
+        } else {
+          this.update = BlockChain.this.userList.get(this.cur);
+          this.cur++;
+          return this.update;
+        }
       } // next()
     };
   } // users()
@@ -172,7 +254,15 @@ public class BlockChain implements Iterable<Transaction> {
    * @return that user's balance (or 0, if the user is not in the system).
    */
   public int balance(String user) {
-    return 0;   // STUB
+    if (this.balances.hasKey(user)) {
+      try {
+        return this.balances.get(user);
+      } catch (Exception e) {
+        return 0;
+      }
+    } else {
+      return 0;
+    }
   } // balance()
 
   /**
@@ -182,12 +272,22 @@ public class BlockChain implements Iterable<Transaction> {
    */
   public Iterator<Block> blocks() {
     return new Iterator<Block>() {
+      // FIELDS
+      Node cur = BlockChain.this.first;
+      Node update = null;
+
       public boolean hasNext() {
-        return false;   // STUB
+        return (cur.getNext() != null);
       } // hasNext()
 
       public Block next() {
-        throw new NoSuchElementException();     // STUB
+        if (!this.hasNext()) {
+          throw new NoSuchElementException();
+        } else {
+          this.update = this.cur;
+          this.cur = this.cur.getNext();
+          return this.update.getBlock();
+        }
       } // next()
     };
   } // blocks()
