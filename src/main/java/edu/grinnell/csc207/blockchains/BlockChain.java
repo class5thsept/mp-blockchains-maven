@@ -193,15 +193,16 @@ public class BlockChain implements Iterable<Transaction> {
     // compare current prevHash to prev hash
     // compare computeHash to hash
     // check hash with validator
-    Block current;
-    if (!blocks().hasNext()) {
-      return true;
-    }
-    blocks().next();
-    while (blocks().hasNext()) {
-      current = blocks().next();
-      // transaction
-    }
+    // Block current;
+    // if (!blocks().hasNext()) {
+    //   return true;
+    // }
+    // blocks().next();
+    // while (blocks().hasNext()) {
+    //   current = blocks().next();
+    //   // transaction
+    // }
+    return true;
   } // isCorrect()
 
   /**
@@ -273,19 +274,19 @@ public class BlockChain implements Iterable<Transaction> {
   public Iterator<Block> blocks() {
     return new Iterator<Block>() {
       // FIELDS
-      Node cur = BlockChain.this.first;
+      Node next = BlockChain.this.first;
       Node update = null;
 
       public boolean hasNext() {
-        return (cur.getNext() != null);
+        return (this.next != null);
       } // hasNext()
 
       public Block next() {
         if (!this.hasNext()) {
           throw new NoSuchElementException();
         } else {
-          this.update = this.cur;
-          this.cur = this.cur.getNext();
+          this.update = this.next;
+          this.next = this.next.getNext();
           return this.update.getBlock();
         }
       } // next()
