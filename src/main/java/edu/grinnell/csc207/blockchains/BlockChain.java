@@ -129,6 +129,8 @@ public class BlockChain implements Iterable<Transaction> {
         this.last.next = newNode;
         this.last = newNode;
         size++;
+
+        // update transactionss
         String source = blk.getTransaction().getSource();
         String target = blk.getTransaction().getTarget();
         int amount = blk.getTransaction().getAmount();

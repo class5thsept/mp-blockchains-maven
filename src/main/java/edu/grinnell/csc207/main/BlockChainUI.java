@@ -107,8 +107,12 @@ public class BlockChainUI {
           long nonce = Long.parseUnsignedLong(IOUtils.readLine(pen, eyes, "Nonce: "));
           Block newBlock = new Block(chain.getSize() + 1, new Transaction(source, target, amount),
               chain.getHash(), nonce);
-          chain.append(newBlock);
-          pen.println("Appended: " + newBlock.toString());
+          try {
+            chain.append(newBlock);
+            pen.println("Appended: " + newBlock.toString());
+          } catch (IllegalArgumentException e) {
+            pen.printf("Could not append - invalid hash for contents.");
+          } // try/catch
           break;
 
         case "balance":
@@ -120,6 +124,7 @@ public class BlockChainUI {
           Iterator<Block> blocks = chain.blocks();
           while (blocks.hasNext()) {
             pen.printf(blocks.next().toString());
+            pen.printf("\n");
           } // while
           break;
 

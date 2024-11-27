@@ -41,6 +41,11 @@ public class Block {
    */
   Hash hash;
 
+  /**
+   * The MessageDigest to calculate the hash for each block.
+  */
+  MessageDigest md;
+
   // +--------------+------------------------------------------------
   // | Constructors |
   // +--------------+
@@ -110,7 +115,7 @@ public class Block {
    * @return the calculated hash of the block.
    */
   public Hash computeHash() throws NoSuchAlgorithmException {
-    MessageDigest md = MessageDigest.getInstance("sha-256");
+    this.md = MessageDigest.getInstance("sha-256");
     byte[] numbytes = ByteBuffer.allocate(Integer.BYTES).putInt(num).array();
     byte[] sourcebytes = transaction.getSource().getBytes();
     byte[] targetbytes = transaction.getTarget().getBytes();
