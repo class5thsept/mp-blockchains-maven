@@ -4,6 +4,8 @@ package edu.grinnell.csc207.blockchains;
  * Things that validate hashes.
  *
  * @author Samuel A. Rebelsky
+ * Leonardo Alves Nunes
+ * Natalie Nardone
  */
 public interface HashValidator {
   /**

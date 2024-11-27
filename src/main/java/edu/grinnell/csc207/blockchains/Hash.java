@@ -17,6 +17,7 @@ public class Hash {
    * The data stored in the hash.
    */
   byte[] data;
+
   // +--------------+------------------------------------------------
   // | Constructors |
   // +--------------+

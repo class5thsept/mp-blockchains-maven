@@ -105,10 +105,11 @@ public class BlockChainUI {
           target = IOUtils.readLine(pen, eyes, "Target: ");
           amount = IOUtils.readInt(pen, eyes, "Amount: ");
           long nonce = Long.parseUnsignedLong(IOUtils.readLine(pen, eyes, "Nonce: "));
-          Block newBlock = new Block(chain.getSize() + 1, new Transaction(source, target, amount), chain.getHash(), nonce);
+          Block newBlock = new Block(chain.getSize() + 1, new Transaction(source, target, amount),
+              chain.getHash(), nonce);
           chain.append(newBlock);
           pen.println("Appended: " + newBlock.toString());
-        break;
+          break;
 
         case "balance":
           String user = IOUtils.readLine(pen, eyes, "User: ");
@@ -119,20 +120,19 @@ public class BlockChainUI {
           Iterator<Block> blocks = chain.blocks();
           while (blocks.hasNext()) {
             pen.printf(blocks.next().toString());
-          }
+          } // while
           break;
 
         case "check":
-          if(chain.isCorrect()) {
+          if (chain.isCorrect()) {
             pen.printf("The blockchain checks out.");
           } else {
             try {
               chain.check();
             } catch (Exception e) {
               pen.printf("%s", e);
-            }
-          }
-          
+            } // try/catch
+          } // if/else
           break;
 
         case "help":
@@ -162,14 +162,14 @@ public class BlockChainUI {
           while (transactions.hasNext()) {
             pen.printf(transactions.next().toString());
             pen.printf("\n");
-          }
+          } // while
           break;
 
         case "users":
-          for(int i = 0; i < chain.getUserList().size(); i++) {
+          for (int i = 0; i < chain.getUserList().size(); i++) {
             pen.printf(chain.getUserList().get(i));
             pen.printf("\n");
-          }
+          } // for
           break;
 
         default:

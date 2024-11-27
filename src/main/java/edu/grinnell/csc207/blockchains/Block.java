@@ -107,6 +107,7 @@ public class Block {
   /**
    * Compute the hash of the block given all the other info already
    * stored in the block.
+   * @return the calculated hash of the block.
    */
   public Hash computeHash() throws NoSuchAlgorithmException {
     MessageDigest md = MessageDigest.getInstance("sha-256");
@@ -181,11 +182,13 @@ public class Block {
    * @return a string representation of the block.
    */
   public String toString() {
-    return 
-    "Block " + this.num + " (Transaction: " +
-     transaction.toString() + " , Nonce: " +
-      this.nonce + " , prevHash: " +
-       this.prevHash + " , hash: " +
-        this.hash + " )";
+    return
+      "Block " + this.num + " (Transaction: "
+      + transaction.toString() + " , Nonce: "
+      + this.nonce
+       + " , prevHash: "
+        + this.prevHash
+         + " , hash: "
+          + this.hash + " )";
   } // toString()
 } // class Block

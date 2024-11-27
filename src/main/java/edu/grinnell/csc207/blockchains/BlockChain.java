@@ -17,11 +17,35 @@ public class BlockChain implements Iterable<Transaction> {
   // +--------+------------------------------------------------------
   // | Fields |
   // +--------+
+
+  /**
+   * The number of blocks in the BlockChain.
+   */
   int size;
+
+  /**
+   * The first node in the BlockChain.
+   */
   Node first;
+
+  /**
+   * The last node in the BlockChain.
+   */
   Node last;
+
+  /**
+   * The validator used to validate the blocks in the BlockChain.
+   */
   HashValidator validator;
+
+  /**
+   * An AssociativeArray of all of the people in the BlockChain and their current balances.
+   */
   AssociativeArray<String, Integer> balances;
+
+  /**
+   * An ArrayList of all of the people in the BlockChain.
+   */
   ArrayList<String> userList;
 
   // +--------------+------------------------------------------------
@@ -75,6 +99,11 @@ public class BlockChain implements Iterable<Transaction> {
     return this.size;
   } // getSize()
 
+  /**
+   * Gets the list of all of the users in the chain.
+   *
+   * @return a list of the users in the chain.
+   */
   public ArrayList<String> getUserList() {
     return this.userList;
   } // getSize()
@@ -90,10 +119,12 @@ public class BlockChain implements Iterable<Transaction> {
    *   hash is incorrect.
    */
   public void append(Block blk) {
+    // need to handle case where didn't mine a block or invalid nonce, etc
     Hash testHash;
     try {
       testHash = blk.computeHash();
-      if (validator.isValid(blk.getHash()) && (blk.getHash().equals(testHash)) && (blk.getPrevHash().equals(this.getHash()))) {
+      if (validator.isValid(blk.getHash()) && (blk.getHash().equals(testHash))
+           && (blk.getPrevHash().equals(this.getHash()))) {
         Node newNode = new Node(this.last, blk, null);
         this.last.next = newNode;
         this.last = newNode;
@@ -107,7 +138,7 @@ public class BlockChain implements Iterable<Transaction> {
               balances.set(source, balances.get(source) - amount);
             } catch (Exception e) {
               System.err.println("Key exception");
-            }
+            } // try/catch
           } else {
             // not valid
             this.userList.add(source);
@@ -115,29 +146,29 @@ public class BlockChain implements Iterable<Transaction> {
               balances.set(source, 0 - amount);
             } catch (Exception e) {
               System.err.println("Key exception");
-            }
-          }
-        }
+            } // try/catch
+          } // if/else
+        } // if
         if (balances.hasKey(target)) {
           try {
             balances.set(target, balances.get(target) + amount);
           } catch (Exception e) {
             System.err.println("Key exception");
-          }
+          } // try/catch
         } else {
           this.userList.add(target);
           try {
             balances.set(target, amount);
           } catch (Exception e) {
             System.err.println("Key exception");
-          }
-        }
+          } // try/catch
+        } // if/else
       } else {
         throw new IllegalArgumentException();
-      }
+      } // if/else
     } catch (NoSuchAlgorithmException e) {
       System.err.println("Invalid algorithm");
-    }
+    } // try/catch
   } // append()
 
   /**
@@ -155,24 +186,24 @@ public class BlockChain implements Iterable<Transaction> {
       this.last = this.last.prev;
       this.last.next = null;
       this.size--;
-      
+
       String source = removed.getBlock().getTransaction().getSource();
       String target = removed.getBlock().getTransaction().getTarget();
       int amount = removed.getBlock().getTransaction().getAmount();
-      
+
       try {
         if (!source.equals("")) {
           balances.set(source, balances.get(source) + amount);
           balances.set(target, balances.get(target) - amount);
         } else {
           balances.set(target, balances.get(target) - amount);
-        }
+        } // if/else
       } catch (Exception e) {
         System.err.println("Key exception");
-      }
+      } // try/catch
 
       return true;
-    }
+    } // if/else
   } // removeLast()
 
   /**
@@ -201,10 +232,10 @@ public class BlockChain implements Iterable<Transaction> {
     Block previous;
 
     Iterator<Block> blocks = this.blocks();
-    
+
     if (this.size == 1) {
       return true;
-    }
+    } // if
     previous = blocks.next();
     //blocks.next();
 
@@ -213,34 +244,34 @@ public class BlockChain implements Iterable<Transaction> {
       String source = current.getTransaction().getSource();
       if (current.getTransaction().getAmount() < 0) {
         return false;
-      }
+      } // if
       if (!source.equals("")) {
-        try{
+        try {
           if ((!balances.hasKey(source)) || (balances.get(source) < 0)) {
             return false;
-          }
+          } // if
         } catch (KeyNotFoundException e) {
           System.err.println("Could not find the key");
-        }
-      }
+        } // try/catch
+      } // if
 
       if (!previous.getHash().equals(current.getPrevHash())) {
         return false;
-      }
+      } // if
 
-      try{
+      try {
         if (!current.getHash().equals(current.computeHash())) {
           return false;
-        }
-      } catch (NoSuchAlgorithmException e){
+        } // if
+      } catch (NoSuchAlgorithmException e) {
         System.err.println("Invalid Algorithm");
-      }
-      
+      } // try/catch
+
       if (!validator.isValid(current.getHash())) {
         return false;
-      }
+      } // if
       previous = current;
-    }
+    } // while
     return true;
   } // isCorrect()
 
@@ -260,7 +291,7 @@ public class BlockChain implements Iterable<Transaction> {
     Block previous;
 
     Iterator<Block> blocks = this.blocks();
-    
+
     if (this.size > 1) {
       previous = blocks.next();
       //blocks.next();
@@ -270,41 +301,44 @@ public class BlockChain implements Iterable<Transaction> {
         String source = current.getTransaction().getSource();
 
         if (current.getTransaction().getAmount() < 0) {
-          throw new Exception("Negative amount in transaction: " + current.getTransaction().getAmount());
-        }
+          throw new Exception("Negative amount in transaction: "
+           + current.getTransaction().getAmount());
+        } // if
 
         if (!source.equals("")) {
-          try{
+          try {
             if ((!balances.hasKey(source))) {
               throw new Exception("Unknown source of transaction: " + source);
-            }
+            } // if
             if ((balances.get(source) < 0)) {
               throw new Exception("Negative balance for: " + source);
-            }
+            } // if
           } catch (KeyNotFoundException e) {
             System.err.println("Could not find the key");
-          }
-        }
+          } // try/catch
+        } // if
 
         if (!previous.getHash().equals(current.getPrevHash())) {
-          throw new Exception("Previous hash does not match with prevHash of the current one. prevHash of current: "
-          + current.getPrevHash() + ". hash of previous: " + previous.getHash());
-        }
+          throw new Exception("Previous hash does not match with prevHash of the current one."
+            + "prevHash of current: " + current.getPrevHash()
+            + ". hash of previous: " + previous.getHash());
+        } // if
 
-        try{
+        try {
           if (!current.getHash().equals(current.computeHash())) {
-            throw new Exception("The provided hash does not match the hash generated by the contents");
-          }
-        } catch (NoSuchAlgorithmException e){
+            throw new Exception("The provided hash does not match the hash generated by "
+             + "the contents");
+          } // if
+        } catch (NoSuchAlgorithmException e) {
           System.err.println("Invalid Algorithm");
-        }
-        
+        } // try/catch
+
         if (!validator.isValid(current.getHash())) {
           throw new Exception("Invalid Hash. Hash: " + current.getHash());
-        }
+        } // if
         previous = current;
-      }
-    }
+      } // while
+    } // if
   } // check()
 
   /**
@@ -330,7 +364,7 @@ public class BlockChain implements Iterable<Transaction> {
           this.update = BlockChain.this.userList.get(this.cur);
           this.cur++;
           return this.update;
-        }
+        } // if/else
       } // next()
     };
   } // users()
@@ -352,15 +386,15 @@ public class BlockChain implements Iterable<Transaction> {
         current = blocks.next();
         if (current.getTransaction().getSource().equals(user)) {
           userBal = userBal - current.getTransaction().getAmount();
-        }
+        } // if
         if (current.getTransaction().getTarget().equals(user)) {
           userBal = userBal + current.getTransaction().getAmount();
-        }
-      }
+        } // if
+      } // while
       return userBal;
     } else {
       return 0;
-    }
+    } // if/else
   } // balance()
 
   /**
@@ -375,23 +409,17 @@ public class BlockChain implements Iterable<Transaction> {
       Node update = null;
 
       public boolean hasNext() {
-        if (this.next == null) {
-          return false;
-        }
-        if (this.next.getBlock() == null) {
-          return false;
-        }
-        return true;
+        return (this.next != null);
       } // hasNext()
 
       public Block next() {
-        if (!this.hasNext()) {       
+        if (!this.hasNext()) {
           throw new NoSuchElementException();
         } else {
           this.update = this.next;
           this.next = this.next.getNext();
           return this.update.getBlock();
-        }
+        } // if/else
       } // next()
     };
   } // blocks()
@@ -408,23 +436,17 @@ public class BlockChain implements Iterable<Transaction> {
       Node update = null;
 
       public boolean hasNext() {
-        if (this.next == null) {
-          return false;
-        }
-        if (this.next.getBlock() == null) {
-          return false;
-        }
-        return true;
+        return (this.next != null);
       } // hasNext()
 
       public Transaction next() {
-        if (!this.hasNext()) {       
+        if (!this.hasNext()) {
           throw new NoSuchElementException();
         } else {
           this.update = this.next;
           this.next = this.next.getNext();
           return this.update.getBlock().getTransaction();
-        }
+        } // if/else
       } // next()
     };
   } // iterator()

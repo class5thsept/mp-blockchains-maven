@@ -5,6 +5,8 @@ package edu.grinnell.csc207.blockchains;
  *
  * @author
  *   Samuel A. Rebelsky
+ * Leonardo Alves Nunes
+ * Natalie Nardone
  */
 public class Transaction {
   // +--------+------------------------------------------------------
